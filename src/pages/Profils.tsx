@@ -8,7 +8,9 @@ import Navbar from "@/components/Navbar";
 
 const Profils = () => {
   const [activeTab, setActiveTab] = useState("startup");
-  const [userRole] = useState<"FOUNDER" | "INVESTOR" | "ADMIN">("INVESTOR"); // Mock data - sera remplacé par Supabase
+
+  // Mock data - sera remplacé par Supabase
+  const userRole: "FOUNDER" | "INVESTOR" | "ADMIN" = "INVESTOR"; // Changé pour tester l'autre onglet
   
   const startupProfile = {
     id: "1",
