@@ -154,20 +154,28 @@ const Profils = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold text-foreground mb-2">{startupProfile.name}</h3>
-                      <p className="text-muted-foreground leading-relaxed text-base">{startupProfile.description}</p>
-                      {startupProfile.website && (
-                        <a 
-                          href={startupProfile.website} 
-                          className="inline-flex items-center gap-2 text-primary hover:text-primary-hover text-sm font-medium mt-3 group"
-                        >
-                          <span className="border-b border-transparent group-hover:border-primary transition-colors">
-                            {startupProfile.website}
-                          </span>
-                          <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </a>
-                      )}
+                      <p className="text-muted-foreground leading-relaxed text-base mb-3">{startupProfile.description}</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-muted-foreground">Email:</span>
+                          <a href={`mailto:${startupProfile.email}`} className="text-primary hover:text-primary-hover font-medium">
+                            {startupProfile.email}
+                          </a>
+                        </div>
+                        {startupProfile.website && (
+                          <a 
+                            href={startupProfile.website} 
+                            className="inline-flex items-center gap-2 text-primary hover:text-primary-hover text-sm font-medium group"
+                          >
+                            <span className="border-b border-transparent group-hover:border-primary transition-colors">
+                              {startupProfile.website}
+                            </span>
+                            <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -325,20 +333,28 @@ const Profils = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold text-foreground mb-2">{investorProfile.name}</h3>
-                      <p className="text-muted-foreground leading-relaxed text-base">{investorProfile.description}</p>
-                      {investorProfile.website && (
-                        <a 
-                          href={investorProfile.website} 
-                          className="inline-flex items-center gap-2 text-success hover:text-success-hover text-sm font-medium mt-3 group"
-                        >
-                          <span className="border-b border-transparent group-hover:border-success transition-colors">
-                            {investorProfile.website}
-                          </span>
-                          <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </a>
-                      )}
+                      <p className="text-muted-foreground leading-relaxed text-base mb-3">{investorProfile.description}</p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-muted-foreground">Email:</span>
+                          <a href={`mailto:${investorProfile.email}`} className="text-success hover:text-success-hover font-medium">
+                            {investorProfile.email}
+                          </a>
+                        </div>
+                        {investorProfile.website && (
+                          <a 
+                            href={investorProfile.website} 
+                            className="inline-flex items-center gap-2 text-success hover:text-success-hover text-sm font-medium group"
+                          >
+                            <span className="border-b border-transparent group-hover:border-success transition-colors">
+                              {investorProfile.website}
+                            </span>
+                            <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
 
