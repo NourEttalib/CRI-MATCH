@@ -33,9 +33,12 @@ const Hero = () => {
           {/* Enhanced Headline with text animations */}
           <h1 className="text-4xl lg:text-7xl font-bold text-foreground mb-8 leading-tight animate-slide-up">
             Connectez votre{" "}
-            <span className="text-primary bg-gradient-to-r from-primary via-primary-hover to-primary bg-clip-text text-transparent animate-glow">startup</span>{" "}
+            <span className="text-primary animate-glow">startup</span>{" "}
             aux bons{" "}
-            <span className="text-success bg-gradient-to-r from-success via-success-hover to-success bg-clip-text text-transparent animate-glow" style={{animationDelay: '0.5s'}}>investisseurs</span>
+            <span className="text-success animate-glow" style={{animationDelay: '0.5s'}}>investisseurs</span>,{" "}
+            <span className="text-primary animate-glow" style={{animationDelay: '1s'}}>opérateurs</span>{" "}
+            et{" "}
+            <span className="text-success animate-glow" style={{animationDelay: '1.5s'}}>accélérateurs</span>
           </h1>
 
           {/* Enhanced Subheadline */}
