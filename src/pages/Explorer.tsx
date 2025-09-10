@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Search, Filter, MapPin, DollarSign, Building, Star } from "lucide-react";
+import { Search, Filter, MapPin, DollarSign, Building, Star, Send, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 
 // Mock data for investors
@@ -52,6 +55,10 @@ const mockInvestors = [
 const Explorer = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
+  const [isMatchDialogOpen, setIsMatchDialogOpen] = useState(false);
+  const [selectedInvestor, setSelectedInvestor] = useState<any>(null);
+  const [matchMessage, setMatchMessage] = useState("");
+  const [sentMatches, setSentMatches] = useState<number[]>([]);
 
   const allSectors = ["SaaS", "FinTech", "HealthTech", "E-commerce", "EdTech", "AI", "Mobility"];
 
@@ -69,6 +76,27 @@ const Explorer = () => {
         ? prev.filter(s => s !== sector)
         : [...prev, sector]
     );
+  };
+
+  const handleMatchProposal = (investor: any) => {
+    setSelectedInvestor(investor);
+    setIsMatchDialogOpen(true);
+    setMatchMessage(`Bonjour ${investor.name},
+
+Je suis intéressé par une collaboration potentielle. Notre startup s'aligne parfaitement avec vos secteurs d'investissement et nous recherchons un partenaire stratégique comme vous.
+
+J'aimerais organiser un appel pour discuter de notre vision et de nos opportunités de croissance.
+
+Cordialement`);
+  };
+
+  const sendMatchRequest = () => {
+    if (!matchMessage.trim()) return;
+    
+    setSentMatches(prev => [...prev, selectedInvestor.id]);
+    setIsMatchDialogOpen(false);
+    setMatchMessage("");
+    toast.success(`Demande de match envoyée à ${selectedInvestor.name} !`);
   };
 
   return (
@@ -189,8 +217,24 @@ const Explorer = () => {
                   </div>
                 </div>
 
-                <Button className="w-full" size="sm">
-                  Proposer un match
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={() => handleMatchProposal(investor)}
+                  disabled={sentMatches.includes(investor.id)}
+                  variant={sentMatches.includes(investor.id) ? "outline" : "default"}
+                >
+                  {sentMatches.includes(investor.id) ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Match envoyé
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      Proposer un match
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -204,6 +248,62 @@ const Explorer = () => {
             <p className="text-muted-foreground">Essayez de modifier vos critères de recherche</p>
           </div>
         )}
+
+        {/* Match Proposal Dialog */}
+        <Dialog open={isMatchDialogOpen} onOpenChange={setIsMatchDialogOpen}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>
+                Proposer un match avec {selectedInvestor?.name}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="p-4 bg-muted/20 rounded-lg">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <span className="text-primary font-bold text-sm">
+                      {selectedInvestor?.logo}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{selectedInvestor?.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Score de compatibilité: {selectedInvestor?.matchScore}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Votre message de présentation
+                </label>
+                <Textarea
+                  value={matchMessage}
+                  onChange={(e) => setMatchMessage(e.target.value)}
+                  rows={8}
+                  placeholder="Présentez votre startup et expliquez pourquoi vous souhaitez collaborer avec cet investisseur..."
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsMatchDialogOpen(false)}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  onClick={sendMatchRequest}
+                  disabled={!matchMessage.trim()}
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Envoyer la demande
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

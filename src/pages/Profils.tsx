@@ -1,20 +1,27 @@
 import { useState } from "react";
-import { User, Building, Users, Edit, Plus } from "lucide-react";
+import { User, Building, Users, Edit, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 
 const Profils = () => {
   const [activeTab, setActiveTab] = useState("startup");
+  const [isEditingStartup, setIsEditingStartup] = useState(false);
+  const [isEditingInvestor, setIsEditingInvestor] = useState(false);
 
   // Mock data - sera remplacé par Supabase
   const [userRole, setUserRole] = useState<"FOUNDER" | "INVESTOR" | "ADMIN">("INVESTOR");
   
-  const startupProfile = {
+  const [startupProfile, setStartupProfile] = useState({
     id: "1",
     name: "TechFlow Solutions",
+    email: "contact@techflow.ma",
     logo: "/api/placeholder/80/80",
     sectors: ["SaaS", "FinTech"],
     stage: "SEED",
@@ -25,11 +32,12 @@ const Profils = () => {
     description: "Plateforme SaaS d'automatisation des processus financiers pour PME",
     website: "https://techflow.ma",
     deckUrl: null
-  };
+  });
 
-  const investorProfile = {
+  const [investorProfile, setInvestorProfile] = useState({
     id: "1",
     name: "Atlas Ventures",
+    email: "contact@atlasventures.ma",
     avatar: "/api/placeholder/80/80",
     thesisSectors: ["SaaS", "FinTech", "HealthTech"],
     thesisStages: ["Seed", "Series A"],
@@ -39,6 +47,31 @@ const Profils = () => {
     keywords: ["early-stage", "tech", "MENA"],
     description: "Fonds d'investissement spécialisé dans les technologies émergentes au Maghreb",
     website: "https://atlasventures.ma"
+  });
+
+  const [editStartupForm, setEditStartupForm] = useState(startupProfile);
+  const [editInvestorForm, setEditInvestorForm] = useState(investorProfile);
+
+  const handleEditStartup = () => {
+    setEditStartupForm(startupProfile);
+    setIsEditingStartup(true);
+  };
+
+  const handleSaveStartup = () => {
+    setStartupProfile(editStartupForm);
+    setIsEditingStartup(false);
+    toast.success("Profil startup mis à jour avec succès !");
+  };
+
+  const handleEditInvestor = () => {
+    setEditInvestorForm(investorProfile);
+    setIsEditingInvestor(true);
+  };
+
+  const handleSaveInvestor = () => {
+    setInvestorProfile(editInvestorForm);
+    setIsEditingInvestor(false);
+    toast.success("Profil investisseur mis à jour avec succès !");
   };
 
   return (
@@ -99,7 +132,12 @@ const Profils = () => {
                       <p className="text-sm text-muted-foreground mt-1">Votre identité entrepreneuriale</p>
                     </div>
                   </CardTitle>
-                  <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 shadow-inner">
+                  <Button 
+                    onClick={handleEditStartup}
+                    variant="outline" 
+                    size="sm" 
+                    className="hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105 shadow-inner"
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Modifier
                   </Button>
@@ -265,7 +303,12 @@ const Profils = () => {
                       <p className="text-sm text-muted-foreground mt-1">Votre expertise financière</p>
                     </div>
                   </CardTitle>
-                  <Button variant="outline" size="sm" className="hover:bg-success hover:text-success-foreground transition-all duration-300 hover:scale-105 shadow-inner">
+                  <Button 
+                    onClick={handleEditInvestor}
+                    variant="outline" 
+                    size="sm" 
+                    className="hover:bg-success hover:text-success-foreground transition-all duration-300 hover:scale-105 shadow-inner"
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Modifier
                   </Button>
@@ -410,6 +453,181 @@ const Profils = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Startup Edit Dialog */}
+        <Dialog open={isEditingStartup} onOpenChange={setIsEditingStartup}>
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Modifier le profil startup</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Nom de la startup</label>
+                  <Input
+                    value={editStartupForm.name}
+                    onChange={(e) => setEditStartupForm(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <Input
+                    type="email"
+                    value={editStartupForm.email}
+                    onChange={(e) => setEditStartupForm(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <Textarea
+                  value={editStartupForm.description}
+                  onChange={(e) => setEditStartupForm(prev => ({ ...prev, description: e.target.value }))}
+                  rows={4}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Website</label>
+                  <Input
+                    value={editStartupForm.website}
+                    onChange={(e) => setEditStartupForm(prev => ({ ...prev, website: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Pays</label>
+                  <Input
+                    value={editStartupForm.country}
+                    onChange={(e) => setEditStartupForm(prev => ({ ...prev, country: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Secteurs (séparés par des virgules)</label>
+                <Input
+                  value={editStartupForm.sectors.join(", ")}
+                  onChange={(e) => setEditStartupForm(prev => ({ 
+                    ...prev, 
+                    sectors: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Mots-clés (séparés par des virgules)</label>
+                <Input
+                  value={editStartupForm.keywords.join(", ")}
+                  onChange={(e) => setEditStartupForm(prev => ({ 
+                    ...prev, 
+                    keywords: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsEditingStartup(false)}>
+                  <X className="w-4 h-4 mr-2" />
+                  Annuler
+                </Button>
+                <Button onClick={handleSaveStartup}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Investor Edit Dialog */}
+        <Dialog open={isEditingInvestor} onOpenChange={setIsEditingInvestor}>
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Modifier le profil investisseur</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Nom du fonds</label>
+                  <Input
+                    value={editInvestorForm.name}
+                    onChange={(e) => setEditInvestorForm(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <Input
+                    type="email"
+                    value={editInvestorForm.email}
+                    onChange={(e) => setEditInvestorForm(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <Textarea
+                  value={editInvestorForm.description}
+                  onChange={(e) => setEditInvestorForm(prev => ({ ...prev, description: e.target.value }))}
+                  rows={4}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Website</label>
+                <Input
+                  value={editInvestorForm.website}
+                  onChange={(e) => setEditInvestorForm(prev => ({ ...prev, website: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Secteurs d'intérêt (séparés par des virgules)</label>
+                <Input
+                  value={editInvestorForm.thesisSectors.join(", ")}
+                  onChange={(e) => setEditInvestorForm(prev => ({ 
+                    ...prev, 
+                    thesisSectors: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Stades d'investissement (séparés par des virgules)</label>
+                <Input
+                  value={editInvestorForm.thesisStages.join(", ")}
+                  onChange={(e) => setEditInvestorForm(prev => ({ 
+                    ...prev, 
+                    thesisStages: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Pays d'investissement (séparés par des virgules)</label>
+                <Input
+                  value={editInvestorForm.thesisCountries.join(", ")}
+                  onChange={(e) => setEditInvestorForm(prev => ({ 
+                    ...prev, 
+                    thesisCountries: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Mots-clés (séparés par des virgules)</label>
+                <Input
+                  value={editInvestorForm.keywords.join(", ")}
+                  onChange={(e) => setEditInvestorForm(prev => ({ 
+                    ...prev, 
+                    keywords: e.target.value.split(",").map(s => s.trim()).filter(Boolean) 
+                  }))}
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsEditingInvestor(false)}>
+                  <X className="w-4 h-4 mr-2" />
+                  Annuler
+                </Button>
+                <Button onClick={handleSaveInvestor}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

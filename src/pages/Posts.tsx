@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Heart, MessageSquare, Share2, Plus, User, Clock } from "lucide-react";
+import { Heart, MessageSquare, Share2, Plus, User, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 
 // Mock data for posts
@@ -22,7 +24,7 @@ const mockPosts = [
     tags: ["EdTech", "IA", "Series A", "Maroc"],
     likes: 24,
     liked: false,
-    comments: 8,
+    comments: [],
     createdAt: "2h",
     fullBody: "Nous développons une plateforme d'apprentissage adaptatif basée sur l'IA qui personnalise l'enseignement selon le profil de chaque étudiant. Après 18 mois de développement et des tests pilotes dans 5 établissements, nous recherchons 500K€ pour notre expansion nationale. Notre solution augmente les résultats d'apprentissage de 40% en moyenne et réduit le décrochage scolaire de 25%. Nous avons déjà des partenariats avec des écoles privées et publiques, et un pipeline de 50+ établissements intéressés."
   },
@@ -38,7 +40,14 @@ const mockPosts = [
     tags: ["FinTech", "Afrique", "Tendances", "2024"],
     likes: 18,
     liked: true,
-    comments: 12,
+    comments: [
+      {
+        id: 1,
+        author: "Marie Dupont",
+        content: "Très intéressant ! Avez-vous des données sur le marché tunisien ?",
+        createdAt: "2h"
+      }
+    ],
     createdAt: "4h",
     fullBody: "L'écosystème FinTech africain connaît une croissance exceptionnelle avec +300% d'investissements en 2023. Les domaines les plus prometteurs incluent les paiements mobiles, le crédit digital et l'assurance parametrique. Nous observons une maturité croissante des startups et une meilleure compréhension des besoins locaux. Les opportunités d'investissement sont particulièrement attractives dans les solutions B2B2C qui s'appuient sur les infrastructures existantes."
   },
@@ -54,7 +63,20 @@ const mockPosts = [
     tags: ["AgriTech", "Rentabilité", "Retour d'expérience"],
     likes: 31,
     liked: false,
-    comments: 15,
+    comments: [
+      {
+        id: 1,
+        author: "Jean Martin",
+        content: "Félicitations ! Pouvez-vous partager plus de détails sur votre MVP ?",
+        createdAt: "4h"
+      },
+      {
+        id: 2,
+        author: "Lisa Chen",
+        content: "Inspirant ! Combien de temps avez-vous passé sur la validation ?",
+        createdAt: "3h"
+      }
+    ],
     createdAt: "1j",
     fullBody: "Retour d'expérience sur notre parcours de startup dans l'AgriTech. De l'idée initiale à la rentabilité, voici les leçons apprises et les erreurs à éviter. Notre focus sur un MVP simple, l'écoute client constante et une approche lean nous ont permis d'atteindre l'équilibre financier plus rapidement que prévu. L'erreur la plus coûteuse fut de sur-engineer notre première version au lieu de valider rapidement nos hypothèses sur le terrain."
   }
@@ -68,6 +90,8 @@ const Posts = () => {
     tags: ""
   });
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newComments, setNewComments] = useState<{ [key: number]: string }>({});
+  const [expandedComments, setExpandedComments] = useState<{ [key: number]: boolean }>({});
 
   const toggleLike = (postId: number) => {
     setPosts(prev => prev.map(post => {
@@ -98,13 +122,46 @@ const Posts = () => {
       tags: newPost.tags.split(',').map(tag => tag.trim()).filter(Boolean),
       likes: 0,
       liked: false,
-      comments: 0,
+      comments: [],
       createdAt: "maintenant"
     };
 
     setPosts(prev => [post, ...prev]);
     setNewPost({ title: "", body: "", tags: "" });
     setIsCreateDialogOpen(false);
+    toast.success("Post publié avec succès !");
+  };
+
+  const addComment = (postId: number) => {
+    const commentText = newComments[postId]?.trim();
+    if (!commentText) return;
+
+    const newComment = {
+      id: Date.now(),
+      author: "Votre Nom",
+      content: commentText,
+      createdAt: "maintenant"
+    };
+
+    setPosts(prev => prev.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          comments: [newComment, ...post.comments]
+        };
+      }
+      return post;
+    }));
+
+    setNewComments(prev => ({ ...prev, [postId]: "" }));
+    toast.success("Commentaire ajouté !");
+  };
+
+  const toggleComments = (postId: number) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
   return (
@@ -213,9 +270,12 @@ const Posts = () => {
                       <span className="text-sm">{post.likes}</span>
                     </button>
                     
-                    <button className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors">
+                    <button 
+                      onClick={() => toggleComments(post.id)}
+                      className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors"
+                    >
                       <MessageSquare className="w-4 h-4" />
-                      <span className="text-sm">{post.comments}</span>
+                      <span className="text-sm">{post.comments.length}</span>
                     </button>
                   </div>
                   
@@ -223,6 +283,50 @@ const Posts = () => {
                     <Share2 className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* Comments Section */}
+                <Collapsible 
+                  open={expandedComments[post.id]} 
+                  onOpenChange={() => toggleComments(post.id)}
+                >
+                  <CollapsibleContent className="border-t border-border mt-4 pt-4">
+                    {/* Add Comment */}
+                    <div className="flex space-x-2 mb-4">
+                      <Input
+                        placeholder="Ajouter un commentaire..."
+                        value={newComments[post.id] || ""}
+                        onChange={(e) => setNewComments(prev => ({ 
+                          ...prev, 
+                          [post.id]: e.target.value 
+                        }))}
+                        onKeyPress={(e) => e.key === 'Enter' && addComment(post.id)}
+                      />
+                      <Button 
+                        size="sm" 
+                        onClick={() => addComment(post.id)}
+                        disabled={!newComments[post.id]?.trim()}
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {/* Comments List */}
+                    <div className="space-y-3">
+                      {post.comments.map(comment => (
+                        <div key={comment.id} className="bg-muted/20 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{comment.author}</span>
+                            <span className="text-xs text-muted-foreground flex items-center">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {comment.createdAt}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{comment.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </CardContent>
             </Card>
           ))}
