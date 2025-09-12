@@ -4,12 +4,36 @@ interface User {
   id: string;
   name: string;
   email: string;
+  userType: 'startup' | 'investor';
+  profile: StartupProfile | InvestorProfile;
+}
+
+interface StartupProfile {
+  description?: string;
+  website?: string;
+  keywords: string[];
+  sectors: string[];
+  stage?: string;
+  country?: string;
+  ticketMin: number;
+  ticketMax: number;
+}
+
+interface InvestorProfile {
+  description?: string;
+  website?: string;
+  keywords: string[];
+  thesisSectors: string[];
+  thesisStages: string[];
+  thesisCountries: string[];
+  ticketMin: number;
+  ticketMax: number;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, userType: 'startup' | 'investor', profileData: any) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -39,20 +63,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const mockUser: User = {
       id: '1',
       name: 'John Doe',
-      email: email
+      email: email,
+      userType: 'startup',
+      profile: {
+        description: 'Sample startup description',
+        website: 'https://sample.com',
+        keywords: ['tech', 'innovation'],
+        sectors: ['SaaS'],
+        stage: 'SEED',
+        country: 'Maroc',
+        ticketMin: 100000,
+        ticketMax: 500000
+      }
     };
     
     setUser(mockUser);
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, userType: 'startup' | 'investor', profileData: any) => {
     // Mock registration - simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const mockUser: User = {
       id: '1',
       name: name,
-      email: email
+      email: email,
+      userType: userType,
+      profile: profileData
     };
     
     setUser(mockUser);
