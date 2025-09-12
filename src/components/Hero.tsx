@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Target, Users, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className="relative py-20 lg:py-32 overflow-hidden">
       {/* Enhanced Background with Moving Elements */}
@@ -50,20 +54,36 @@ const Hero = () => {
 
           {/* Enhanced CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20 animate-slide-up" style={{animationDelay: '0.6s'}}>
-            <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg font-semibold">
-              <span className="relative z-10 flex items-center">
-                Trouver mes investisseurs
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-            </Button>
-            <Button variant="success" size="lg" className="group relative overflow-hidden bg-gradient-to-r from-success to-success-hover hover:from-success-hover hover:to-success shadow-success hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg font-semibold">
-              <span className="relative z-10 flex items-center">
-                Découvrir des startups
-                <Users className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform duration-300" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Link to="/explorer">
+                  <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg font-semibold">
+                    <span className="relative z-10 flex items-center">
+                      Trouver mes investisseurs
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  </Button>
+                </Link>
+                <Link to="/posts">
+                  <Button variant="success" size="lg" className="group relative overflow-hidden bg-gradient-to-r from-success to-success-hover hover:from-success-hover hover:to-success shadow-success hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg font-semibold">
+                    <span className="relative z-10 flex items-center">
+                      Découvrir des startups
+                      <Users className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform duration-300" />
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Button size="lg" className="group relative overflow-hidden bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8 py-4 text-lg font-semibold">
+                <span className="relative z-10 flex items-center">
+                  Commencer maintenant
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              </Button>
+            )}
           </div>
 
           {/* Enhanced Stats with animation */}
