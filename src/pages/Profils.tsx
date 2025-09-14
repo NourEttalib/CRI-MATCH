@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Building, Users, Edit, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,67 +9,107 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profils = () => {
-  const [activeTab, setActiveTab] = useState("startup");
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState(user?.userType === 'startup' ? "startup" : "investor");
   const [isEditingStartup, setIsEditingStartup] = useState(false);
   const [isEditingInvestor, setIsEditingInvestor] = useState(false);
 
-  // Mock data - sera remplacé par Supabase
-  const [userRole, setUserRole] = useState<"FOUNDER" | "INVESTOR" | "ADMIN">("INVESTOR");
-  
-  const [startupProfile, setStartupProfile] = useState({
-    id: "1",
-    name: "TechFlow Solutions",
-    email: "contact@techflow.ma",
+  // Get profile data from authenticated user
+  const startupProfile = user?.userType === 'startup' ? {
+    id: user.id,
+    name: user.name,
+    email: user.email,
     logo: "/api/placeholder/80/80",
-    sectors: ["SaaS", "FinTech"],
-    stage: "SEED",
-    country: "Maroc",
-    ticketMin: 100000,
-    ticketMax: 500000,
-    keywords: ["AI", "B2B", "automation"],
-    description: "Plateforme SaaS d'automatisation des processus financiers pour PME",
-    website: "https://techflow.ma",
+    sectors: (user.profile as any).sectors || [],
+    stage: (user.profile as any).stage || "",
+    country: (user.profile as any).country || "",
+    ticketMin: user.profile.ticketMin || 0,
+    ticketMax: user.profile.ticketMax || 0,
+    keywords: user.profile.keywords || [],
+    description: user.profile.description || "", 
+    website: user.profile.website || "",
     deckUrl: null
-  });
+  } : null;
 
-  const [investorProfile, setInvestorProfile] = useState({
-    id: "1",
-    name: "Atlas Ventures",
-    email: "contact@atlasventures.ma",
+  const investorProfile = user?.userType === 'investor' ? {
+    id: user.id,
+    name: user.name,
+    email: user.email,
     avatar: "/api/placeholder/80/80",
-    thesisSectors: ["SaaS", "FinTech", "HealthTech"],
-    thesisStages: ["Seed", "Series A"],
-    thesisCountries: ["Maroc", "Tunisie"],
-    ticketMin: 50000,
-    ticketMax: 500000,
-    keywords: ["early-stage", "tech", "MENA"],
-    description: "Fonds d'investissement spécialisé dans les technologies émergentes au Maghreb",
-    website: "https://atlasventures.ma"
-  });
+    thesisSectors: (user.profile as any).thesisSectors || [],
+    thesisStages: (user.profile as any).thesisStages || [],
+    thesisCountries: (user.profile as any).thesisCountries || [],
+    ticketMin: user.profile.ticketMin || 0,
+    ticketMax: user.profile.ticketMax || 0,
+    keywords: user.profile.keywords || [],
+    description: user.profile.description || "",
+    website: user.profile.website || ""
+  } : null;
 
-  const [editStartupForm, setEditStartupForm] = useState(startupProfile);
-  const [editInvestorForm, setEditInvestorForm] = useState(investorProfile);
+  const [editStartupForm, setEditStartupForm] = useState<any>(startupProfile || {});
+  const [editInvestorForm, setEditInvestorForm] = useState<any>(investorProfile || {});
 
   const handleEditStartup = () => {
-    setEditStartupForm(startupProfile);
-    setIsEditingStartup(true);
+    if (startupProfile) {
+      setEditStartupForm(startupProfile);
+      setIsEditingStartup(true);
+    }
   };
 
   const handleSaveStartup = () => {
-    setStartupProfile(editStartupForm);
+    if (user) {
+      const updatedUser = {
+        ...user,
+        name: editStartupForm.name,
+        profile: {
+          ...user.profile,
+          description: editStartupForm.description,
+          website: editStartupForm.website,
+          sectors: editStartupForm.sectors,
+          stage: editStartupForm.stage,
+          country: editStartupForm.country,
+          ticketMin: editStartupForm.ticketMin,
+          ticketMax: editStartupForm.ticketMax,
+          keywords: editStartupForm.keywords
+        }
+      };
+      localStorage.setItem('cri-match-user', JSON.stringify(updatedUser));
+      window.location.reload(); // Simple way to refresh data
+    }
     setIsEditingStartup(false);
     toast.success("Profil startup mis à jour avec succès !");
   };
 
   const handleEditInvestor = () => {
-    setEditInvestorForm(investorProfile);
-    setIsEditingInvestor(true);
+    if (investorProfile) {
+      setEditInvestorForm(investorProfile);
+      setIsEditingInvestor(true);
+    }
   };
 
   const handleSaveInvestor = () => {
-    setInvestorProfile(editInvestorForm);
+    if (user) {
+      const updatedUser = {
+        ...user,
+        name: editInvestorForm.name,
+        profile: {
+          ...user.profile,
+          description: editInvestorForm.description,
+          website: editInvestorForm.website,
+          thesisSectors: editInvestorForm.thesisSectors,
+          thesisStages: editInvestorForm.thesisStages,
+          thesisCountries: editInvestorForm.thesisCountries,
+          ticketMin: editInvestorForm.ticketMin,
+          ticketMax: editInvestorForm.ticketMax,
+          keywords: editInvestorForm.keywords
+        }
+      };
+      localStorage.setItem('cri-match-user', JSON.stringify(updatedUser));
+      window.location.reload(); // Simple way to refresh data
+    }
     setIsEditingInvestor(false);
     toast.success("Profil investisseur mis à jour avec succès !");
   };
@@ -119,7 +159,7 @@ const Profils = () => {
           </TabsList>
 
           <TabsContent value="startup">
-            {userRole === "FOUNDER" || userRole === "ADMIN" ? (
+            {user?.userType === 'startup' && startupProfile ? (
               <Card className="border-0 shadow-elegant bg-gradient-to-br from-card to-card/80 backdrop-blur-sm overflow-hidden hover-lift animate-fade-in">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-primary-hover to-success"></div>
                 <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-primary/5 to-transparent pb-6">
@@ -298,7 +338,7 @@ const Profils = () => {
           </TabsContent>
 
           <TabsContent value="investor">
-            {userRole === "INVESTOR" || userRole === "ADMIN" ? (
+            {user?.userType === 'investor' && investorProfile ? (
               <Card className="border-0 shadow-elegant bg-gradient-to-br from-card to-card/80 backdrop-blur-sm overflow-hidden hover-lift animate-fade-in">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-success via-success-hover to-primary"></div>
                 <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-success/5 to-transparent pb-6">

@@ -53,13 +53,27 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    // Load user from localStorage on initialization
+    const savedUser = localStorage.getItem('cri-match-user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const login = async (email: string, password: string) => {
     // Mock login - simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Mock user data
+    // Check if user exists in localStorage
+    const savedUser = localStorage.getItem('cri-match-user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      if (parsedUser.email === email) {
+        setUser(parsedUser);
+        return;
+      }
+    }
+    
+    // Mock user data if no saved user found
     const mockUser: User = {
       id: '1',
       name: 'John Doe',
@@ -77,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
     
+    localStorage.setItem('cri-match-user', JSON.stringify(mockUser));
     setUser(mockUser);
   };
 
@@ -85,17 +100,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const mockUser: User = {
-      id: '1',
+      id: Date.now().toString(),
       name: name,
       email: email,
       userType: userType,
       profile: profileData
     };
     
+    // Save to localStorage
+    localStorage.setItem('cri-match-user', JSON.stringify(mockUser));
     setUser(mockUser);
   };
 
   const logout = () => {
+    localStorage.removeItem('cri-match-user');
     setUser(null);
   };
 
