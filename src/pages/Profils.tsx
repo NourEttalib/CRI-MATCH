@@ -26,17 +26,10 @@ const Profils = () => {
     }
   }, [user?.userType]);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, user, navigate]);
-
-  // Show loading while redirecting or user not loaded
+  // Show loading or redirect if not authenticated
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-gradient-profile flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Chargement...</p>
@@ -45,8 +38,12 @@ const Profils = () => {
     );
   }
 
+  console.log('User data:', user);
+  console.log('User type:', user.userType);
+  console.log('User profile:', user.profile);
+
   // Get profile data from authenticated user with safe null checks and defaults
-  const startupProfile = user?.userType === 'startup' ? {
+  const startupProfile = user.userType === 'startup' ? {
     id: user.id,
     name: user.name || 'Sans nom',
     email: user.email || '',
@@ -54,15 +51,15 @@ const Profils = () => {
     sectors: Array.isArray((user.profile as any)?.sectors) ? (user.profile as any).sectors : [],
     stage: (user.profile as any)?.stage || "Non spécifié",
     country: (user.profile as any)?.country || "Non spécifié",
-    ticketMin: user.profile?.ticketMin || 0,
-    ticketMax: user.profile?.ticketMax || 0,
-    keywords: Array.isArray(user.profile?.keywords) ? user.profile.keywords : [],
-    description: user.profile?.description || "Aucune description disponible", 
-    website: user.profile?.website || "",
+    ticketMin: (user.profile as any)?.ticketMin || 0,
+    ticketMax: (user.profile as any)?.ticketMax || 0,
+    keywords: Array.isArray((user.profile as any)?.keywords) ? (user.profile as any).keywords : [],
+    description: (user.profile as any)?.description || "Aucune description disponible", 
+    website: (user.profile as any)?.website || "",
     deckUrl: null
   } : null;
 
-  const investorProfile = user?.userType === 'investor' ? {
+  const investorProfile = user.userType === 'investor' ? {
     id: user.id,
     name: user.name || 'Sans nom',
     email: user.email || '',
@@ -70,11 +67,11 @@ const Profils = () => {
     thesisSectors: Array.isArray((user.profile as any)?.thesisSectors) ? (user.profile as any).thesisSectors : [],
     thesisStages: Array.isArray((user.profile as any)?.thesisStages) ? (user.profile as any).thesisStages : [],
     thesisCountries: Array.isArray((user.profile as any)?.thesisCountries) ? (user.profile as any).thesisCountries : [],
-    ticketMin: user.profile?.ticketMin || 0,
-    ticketMax: user.profile?.ticketMax || 0,
-    keywords: Array.isArray(user.profile?.keywords) ? user.profile.keywords : [],
-    description: user.profile?.description || "Aucune description disponible",
-    website: user.profile?.website || ""
+    ticketMin: (user.profile as any)?.ticketMin || 0,
+    ticketMax: (user.profile as any)?.ticketMax || 0,
+    keywords: Array.isArray((user.profile as any)?.keywords) ? (user.profile as any).keywords : [],
+    description: (user.profile as any)?.description || "Aucune description disponible",
+    website: (user.profile as any)?.website || ""
   } : null;
 
   const [editStartupForm, setEditStartupForm] = useState<any>(startupProfile || {});
@@ -143,7 +140,7 @@ const Profils = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-profile relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       <Navbar />
       
       {/* Background Pattern */}
