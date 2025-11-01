@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { User, Building, Users, Edit, Plus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,40 +13,67 @@ import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Profils = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState(user?.userType === 'startup' ? "startup" : "investor");
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState("startup");
   const [isEditingStartup, setIsEditingStartup] = useState(false);
   const [isEditingInvestor, setIsEditingInvestor] = useState(false);
 
-  // Get profile data from authenticated user with safe null checks
+  // Update activeTab when user loads
+  useEffect(() => {
+    if (user?.userType) {
+      setActiveTab(user.userType === 'startup' ? "startup" : "investor");
+    }
+  }, [user?.userType]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  // Show loading while redirecting or user not loaded
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-profile flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get profile data from authenticated user with safe null checks and defaults
   const startupProfile = user?.userType === 'startup' ? {
     id: user.id,
-    name: user.name,
-    email: user.email,
+    name: user.name || 'Sans nom',
+    email: user.email || '',
     logo: "/api/placeholder/80/80",
-    sectors: (user.profile as any)?.sectors || [],
-    stage: (user.profile as any)?.stage || "",
-    country: (user.profile as any)?.country || "",
+    sectors: Array.isArray((user.profile as any)?.sectors) ? (user.profile as any).sectors : [],
+    stage: (user.profile as any)?.stage || "Non spécifié",
+    country: (user.profile as any)?.country || "Non spécifié",
     ticketMin: user.profile?.ticketMin || 0,
     ticketMax: user.profile?.ticketMax || 0,
-    keywords: user.profile?.keywords || [],
-    description: user.profile?.description || "", 
+    keywords: Array.isArray(user.profile?.keywords) ? user.profile.keywords : [],
+    description: user.profile?.description || "Aucune description disponible", 
     website: user.profile?.website || "",
     deckUrl: null
   } : null;
 
   const investorProfile = user?.userType === 'investor' ? {
     id: user.id,
-    name: user.name,
-    email: user.email,
+    name: user.name || 'Sans nom',
+    email: user.email || '',
     avatar: "/api/placeholder/80/80",
-    thesisSectors: (user.profile as any)?.thesisSectors || [],
-    thesisStages: (user.profile as any)?.thesisStages || [],
-    thesisCountries: (user.profile as any)?.thesisCountries || [],
+    thesisSectors: Array.isArray((user.profile as any)?.thesisSectors) ? (user.profile as any).thesisSectors : [],
+    thesisStages: Array.isArray((user.profile as any)?.thesisStages) ? (user.profile as any).thesisStages : [],
+    thesisCountries: Array.isArray((user.profile as any)?.thesisCountries) ? (user.profile as any).thesisCountries : [],
     ticketMin: user.profile?.ticketMin || 0,
     ticketMax: user.profile?.ticketMax || 0,
-    keywords: user.profile?.keywords || [],
-    description: user.profile?.description || "",
+    keywords: Array.isArray(user.profile?.keywords) ? user.profile.keywords : [],
+    description: user.profile?.description || "Aucune description disponible",
     website: user.profile?.website || ""
   } : null;
 
