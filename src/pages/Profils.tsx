@@ -17,20 +17,20 @@ const Profils = () => {
   const [isEditingStartup, setIsEditingStartup] = useState(false);
   const [isEditingInvestor, setIsEditingInvestor] = useState(false);
 
-  // Get profile data from authenticated user
+  // Get profile data from authenticated user with safe null checks
   const startupProfile = user?.userType === 'startup' ? {
     id: user.id,
     name: user.name,
     email: user.email,
     logo: "/api/placeholder/80/80",
-    sectors: (user.profile as any).sectors || [],
-    stage: (user.profile as any).stage || "",
-    country: (user.profile as any).country || "",
-    ticketMin: user.profile.ticketMin || 0,
-    ticketMax: user.profile.ticketMax || 0,
-    keywords: user.profile.keywords || [],
-    description: user.profile.description || "", 
-    website: user.profile.website || "",
+    sectors: (user.profile as any)?.sectors || [],
+    stage: (user.profile as any)?.stage || "",
+    country: (user.profile as any)?.country || "",
+    ticketMin: user.profile?.ticketMin || 0,
+    ticketMax: user.profile?.ticketMax || 0,
+    keywords: user.profile?.keywords || [],
+    description: user.profile?.description || "", 
+    website: user.profile?.website || "",
     deckUrl: null
   } : null;
 
@@ -39,14 +39,14 @@ const Profils = () => {
     name: user.name,
     email: user.email,
     avatar: "/api/placeholder/80/80",
-    thesisSectors: (user.profile as any).thesisSectors || [],
-    thesisStages: (user.profile as any).thesisStages || [],
-    thesisCountries: (user.profile as any).thesisCountries || [],
-    ticketMin: user.profile.ticketMin || 0,
-    ticketMax: user.profile.ticketMax || 0,
-    keywords: user.profile.keywords || [],
-    description: user.profile.description || "",
-    website: user.profile.website || ""
+    thesisSectors: (user.profile as any)?.thesisSectors || [],
+    thesisStages: (user.profile as any)?.thesisStages || [],
+    thesisCountries: (user.profile as any)?.thesisCountries || [],
+    ticketMin: user.profile?.ticketMin || 0,
+    ticketMax: user.profile?.ticketMax || 0,
+    keywords: user.profile?.keywords || [],
+    description: user.profile?.description || "",
+    website: user.profile?.website || ""
   } : null;
 
   const [editStartupForm, setEditStartupForm] = useState<any>(startupProfile || {});
